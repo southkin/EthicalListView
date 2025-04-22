@@ -97,6 +97,7 @@ struct EthicalListViewPreview_Previews: PreviewProvider {
                     .frame(width: 127, height: 127, alignment: .center)
                     .background(Color.blue.opacity(0.2))
             }
+            
         }
         
     }
