@@ -19,7 +19,7 @@ so I wrapped `NSCollectionView` too.
 1. Open Xcode > File > Add Packages...
 1. Enter repository URL:
     ```markdown
-    https://github.com/your-username/EthicalListView.git
+    https://github.com/southkin/EthicalListView
     ```
 1. In your Swift file:
     ```swift
