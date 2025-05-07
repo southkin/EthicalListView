@@ -1,9 +1,7 @@
-//
-//  Collection_UIKit.swift
+//  CollectionView_UIKit.swift
 //  EthicalListView
 //
 //  Created by kin on 4/21/25.
-//
 
 import SwiftUI
 #if os(iOS)
@@ -11,6 +9,7 @@ import UIKit
 
 class CollectionCell_UIKit: UICollectionViewCell {
     private var hostingController: UIHostingController<AnyView>?
+    private var hostingConfiguration: Any? // UIHostingConfiguration<AnyView, EmptyView> (iOS 16+)
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -21,22 +20,35 @@ class CollectionCell_UIKit: UICollectionViewCell {
     }
 
     func configure<T: View>(with view: T) {
-        
-        hostingController?.view.removeFromSuperview()
-        hostingController = UIHostingController(rootView: AnyView(view))
-        hostingController!.view.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(hostingController!.view)
+        if #available(iOS 16.0, *) {
+            let config = UIHostingConfiguration {
+                AnyView(view)
+            }
+            .margins(.all, 0)
 
-        NSLayoutConstraint.activate([
-            hostingController!.view.topAnchor.constraint(equalTo: contentView.topAnchor),
-            hostingController!.view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-            hostingController!.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            hostingController!.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
-        ])
-        
-        hostingController!.view.layoutIfNeeded()
+            // ✅ 실제로 iOS 16+에서만 적용
+            self.hostingConfiguration = config
+            self.contentConfiguration = config
+            
+        } else {
+            // Fallback for iOS 15 and below
+            hostingController?.view.removeFromSuperview()
+            hostingController = UIHostingController(rootView: AnyView(view))
+            hostingController!.view.translatesAutoresizingMaskIntoConstraints = false
+            contentView.addSubview(hostingController!.view)
+
+            NSLayoutConstraint.activate([
+                hostingController!.view.topAnchor.constraint(equalTo: contentView.topAnchor),
+                hostingController!.view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+                hostingController!.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+                hostingController!.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
+            ])
+            
+            hostingController!.view.layoutIfNeeded()
+        }
     }
 }
+
 /// **✅ 공용 컬렉션 뷰 컨트롤러 (`UICollectionView` 기반)**
 struct CollectionView_UIKit<Item, Content>: UIViewControllerRepresentable where Content: View {
     let items: [Item]
@@ -115,7 +127,5 @@ struct CollectionView_UIKit<Item, Content>: UIViewControllerRepresentable where 
         }
     }
 }
-
-
 
 #endif
